@@ -9,5 +9,5 @@ use serde::{Deserialize, Serialize};
 pub struct MerkleProof<Digest> {
     pub root: Digest,
     pub nodes: Vec<Digest>,
-    pub leaf_index: u32,
+    pub leaf_index: u64,
 }

@@ -7,20 +7,49 @@ use risc0_zkvm::{default_prover, ExecutorEnv, InnerReceipt};
 use risc0_zkvm::sha::{Digest, Impl, Sha256};
 use merkle_proof::MerkleProof;
 
-fn get_merkle_proof() -> MerkleProof<Digest> {
+fn hash(left: Digest, right: Digest) -> Digest {
+    *Impl::hash_bytes(&[left.as_bytes(), right.as_bytes()].concat())
+}
+
+#[allow(dead_code)]
+fn get_short_merkle_proof() -> MerkleProof<Digest> {
     //             root
     //    h(0,0)            h(leaf, 0)
     // 0          0     leaf          0
 
-    let leaf_value = Digest::from([1; 8]); // index 6
-    let parent_value = *Impl::hash_bytes(&[leaf_value.as_bytes(), Digest::ZERO.as_bytes()].concat()); // index 3
-    let uncle_value = *Impl::hash_bytes(&[Digest::ZERO.as_bytes(), Digest::ZERO.as_bytes()].concat()); // index 2
-    let root_value = *Impl::hash_bytes(&[uncle_value.as_bytes(), parent_value.as_bytes()].concat()); // index 1
+    let leaf_value = Digest::from([1; 8]);              // index 6
+    let parent_value = hash(leaf_value, Digest::ZERO);  // index 3
+    let uncle_value = hash(Digest::ZERO, Digest::ZERO); // index 2
+    let root_value = hash(uncle_value, parent_value);   // index 1
 
     MerkleProof {
         root: root_value,
         nodes: vec![leaf_value, Digest::ZERO, uncle_value],
         leaf_index: 6,
+    }
+}
+
+fn get_long_merkle_proof() -> MerkleProof<Digest> {
+    let leaf_value = Digest::from([1; 8]);
+    let leaf_index = (1u64 << 34) + (1u64 << 33);
+
+    let mut index = leaf_index;
+    let nodes = [vec![leaf_value], Vec::from([Digest::ZERO; 34])].concat();
+
+    let mut current_hash = leaf_value;
+    while index > 1 {
+        if index % 2 == 0 {
+            current_hash = hash(current_hash, Digest::ZERO);
+        } else {
+            current_hash = hash(Digest::ZERO, current_hash);
+        }
+        index /= 2;
+    }
+
+    MerkleProof {
+        root: current_hash,
+        nodes,
+        leaf_index,
     }
 }
 
@@ -30,7 +59,7 @@ fn main() {
         .init();
 
     let env = ExecutorEnv::builder()
-        .write(&get_merkle_proof())
+        .write(&get_long_merkle_proof())
         .unwrap()
         .build()
         .unwrap();
