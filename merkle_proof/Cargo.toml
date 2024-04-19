@@ -1,0 +1,10 @@
+[package]
+name = "merkle_proof"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+serde = { version = "1.0.198", features = ["derive"], default-features = false }
