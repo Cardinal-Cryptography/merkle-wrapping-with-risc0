@@ -4,7 +4,7 @@ use crate::data::get_long_merkle_proof;
 
 mod data;
 mod only_stark;
-// mod stark_then_groth;
+mod stark_then_groth;
 
 fn get_executor_env() -> ExecutorEnv<'static> {
     ExecutorEnv::builder()
@@ -24,9 +24,11 @@ fn measure<F: FnOnce() -> T, T>(f: F) -> (Duration, T) {
 fn main() {
     tracing_subscriber::fmt()
         .with_env_filter(tracing_subscriber::filter::EnvFilter::from_default_env())
-        .with_max_level(tracing::Level::INFO)
+        // .with_max_level(tracing::Level::INFO)
         .init();
 
+    println!("==== Running the Stark pipeline =====");
     only_stark::stark_pipeline(get_executor_env());
-    // wrapping_pipeline(get_env());
+    println!("==== Running the Stark+Groth pipeline =====");
+    stark_then_groth::wrapping_pipeline(get_executor_env());
 }

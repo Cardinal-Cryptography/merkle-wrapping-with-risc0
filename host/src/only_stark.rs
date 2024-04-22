@@ -41,7 +41,7 @@ pub fn stark_pipeline(env: ExecutorEnv) {
         "Proving time: {proving_time:?}\n\
         Verifying time (composite proof): {verifying_time:?}\n\
         Compression time: {compression_time:?}\n\
-        Verifying time (succinct proof): {succinct_verifying_time:?}\n\
+        Verifying time (succinct proof): {succinct_verifying_time:?}\n\n\
         Composite proof size: {composite_size}kB, Succinct proof size: {succinct_size}kB",
     );
 }
