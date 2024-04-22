@@ -3,15 +3,14 @@ name = "host"
 version = "0.1.0"
 edition = "2021"
 
-[[bin]]
-name = "host"
-path = "main.rs"
-
 [dependencies]
 methods = { path = "../methods" }
 
 merkle_proof = { path = "../merkle_proof" }
 
-risc0-zkvm = { version = "0.21.0" }
+risc0-groth16 = { version = "0.21.0", features = ["prove"] }
+risc0-zkvm = { version = "0.21.0", features = ["prove"] }
+
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 serde = "1.0"
+tracing = "0.1.40"
